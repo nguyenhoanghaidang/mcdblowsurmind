@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HAI DANG | FAILURE IN LOVE</title>
+    <style>
+      /* --- 1. RESET & GIAO DIỆN CHUNG --- */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        user-select: none;
+      }
+      body,
+      html {
+        width: 100%;
+        height: 100%;
+        background-color: #050505;
+        color: #d1d1d1;
+        font-family: "Courier New", Courier, monospace;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* Lớp phủ nhiễu hạt và làm tối góc */
+      .noise-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 9999;
+        opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      }
+      .vignette {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, transparent 50%, #000000 120%);
+        pointer-events: none;
+        z-index: 9998;
+      }
+
+      /* --- 2. ẢNH NỀN TĨNH --- */
+      .static-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+        transition: opacity 0.6s ease;
+      }
+      .static-background img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(0.6) contrast(1.2);
+      }
+      body.menu-active .static-background {
+        opacity: 0.3;
+      }
+
+      /* --- 3. CHỮ ĐỎ KHỔNG LỒ --- */
+      .background-giant-text {
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.95);
+        font-size: 25vw;
+        font-family: "Times New Roman", Times, serif;
+        color: #5a0e0e;
+        font-weight: bold;
+        letter-spacing: -15px;
+        z-index: 1;
+        opacity: 0;
+        transition:
+          transform 1s cubic-bezier(0.16, 1, 0.3, 1),
+          opacity 0.8s ease;
+        text-align: center;
+        width: 100%;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      body.menu-active .background-giant-text {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      /* --- 4. BỐ CỤC UI 4 GÓC --- */
+      .ui-element {
+        position: absolute;
+        font-size: 9px;
+        letter-spacing: 3px;
+        z-index: 10;
+        text-transform: uppercase;
+        color: #888;
+      }
+      .top-left {
+        top: 30px;
+        left: 40px;
+      }
+      .top-right {
+        top: 30px;
+        right: 40px;
+        cursor: pointer;
+        color: #b3b3b3;
+        transition: opacity 0.4s ease; /* Thêm hiệu ứng chuyển mượt */
+      }
+
+      /* Ẩn nút EN/VI góc phải khi mở Menu Khám Phá */
+      body.menu-active .top-right {
+        opacity: 0;
+        pointer-events: none; /* Khóa click khi đã ẩn */
+      }
+      .bottom-left {
+        bottom: 30px;
+        left: 40px;
+      }
+      .bottom-center {
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-decoration: underline;
+        cursor: pointer;
+        color: #b3b3b3;
+      }
+      .bottom-right {
+        bottom: 30px;
+        right: 40px;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+      a:hover {
+        color: #fff;
+      }
+      .lang-active {
+        color: #fff;
+        font-weight: bold;
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+      }
+      .lang-inactive {
+        color: #555;
+        transition: 0.3s;
+      }
+      .lang-inactive:hover {
+        color: #aaa;
+      }
+
+      /* --- 5. NÚT EXPLORE VÀ MENU --- */
+      .hero-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: block;
+        z-index: 5;
+        transition:
+          opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.6s ease;
+        pointer-events: none;
+      }
+      .cta-box {
+        position: absolute;
+        bottom: 12%;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        pointer-events: auto;
+      }
+      .main-title {
+        font-size: 10px;
+        letter-spacing: 4px;
+        margin-bottom: 25px;
+        color: #bbb;
+        font-weight: bold;
+      }
+      .explore-button {
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid #555;
+        color: #ddd;
+        padding: 10px 25px;
+        font-family: inherit;
+        font-size: 9px;
+        letter-spacing: 3px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+      }
+      .explore-button:hover {
+        border-color: #fff;
+        background-color: #fff;
+        color: #000;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+      }
+      body.menu-active .hero-container {
+        opacity: 0;
+        transform: scale(0.9);
+        pointer-events: none;
+      }
+
+      .menu-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 6;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.6s ease;
+      }
+      body.menu-active .menu-container {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .menu-navigation {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+      }
+      .menu-navigation ul {
+        list-style: none;
+      }
+      .menu-navigation li {
+        margin: 20px 0;
+        opacity: 0;
+        transform: translateY(15px);
+        transition:
+          transform 0.5s ease,
+          opacity 0.5s ease;
+      }
+      body.menu-active .menu-navigation li {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .menu-link {
+        font-family: inherit;
+        font-size: 18px;
+        font-weight: bold;
+        letter-spacing: 6px;
+        color: #999;
+        transition: all 0.3s ease;
+        display: inline-block;
+      }
+      .menu-link:hover {
+        color: #fff;
+        transform: scale(1.05);
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      }
+      .menu-lang {
+        font-size: 9px;
+        margin-top: 40px;
+        color: #555;
+        letter-spacing: 3px;
+        cursor: pointer;
+      }
+      .close-box {
+        position: absolute;
+        bottom: 12%;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .close-button {
+        background: transparent;
+        border: 1px solid #333;
+        color: #777;
+        padding: 10px 25px;
+        font-family: inherit;
+        font-size: 9px;
+        letter-spacing: 3px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .close-button:hover {
+        border-color: #5a0e0e;
+        color: #fff;
+        background-color: #5a0e0e;
+      }
+
+      /* --- 6. POP-UP ABOUT ME CỦA BẠN --- */
+      .about-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.4s;
+        z-index: 10000;
+      }
+      .about-modal.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      .about-content {
+        width: 90%;
+        max-width: 850px;
+        text-align: center;
+        line-height: 1.8;
+        color: #ccc;
+      }
+      .about-content h2 {
+        margin-bottom: 30px;
+        letter-spacing: 4px;
+        color: #fff;
+      }
+      .about-content a {
+        color: #701212;
+        text-decoration: underline;
+        font-weight: bold;
+      }
+      .about-content a:hover {
+        color: #fff;
+      }
+      .close-about {
+        position: absolute;
+        top: 30px;
+        right: 40px;
+        border: none;
+        background: none;
+        color: #fff;
+        font-size: 40px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .close-about:hover {
+        color: #701212;
+        transform: scale(1.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="noise-overlay"></div>
+    <div class="vignette"></div>
+
+    <div class="static-background">
+      <img
+        src="https://uniquewedding.com.vn/wp-content/uploads/android-hinh-nen-dien-thoai-den-8.webp"
+        alt="Background"
+      />
+    </div>
+
+    <div class="background-giant-text">NHHD</div>
+
+    <div class="ui-element top-left">
+      <div id="text-top-left">+ INTERACTIVE PORTFOLIO</div>
+
+      <div class="social-list">
+        <a href="https://soundcloud.com/nguyenhoanghaidang" target="_blank"
+          >SOUNDCLOUD</a
+        >
+        <a href="https://web.telegram.org/k/#@mcdblowsurmind" target="_blank"
+          >TELE</a
+        >
+        <a href="https://zalo.me/0947789420" target="_blank">ZALO</a>
+        <a href="https://www.youtube.com/@nhhd2006" target="_blank">YTB</a>
+        <a href="https://www.locket.cam/hdeng1826" target="_blank">LOCKET</a>
+        <a
+          href="https://www.threads.com/@nnguyenhoanghaidang?hl=vi"
+          target="_blank"
+          >THREADS</a
+        >
+      </div>
+    </div>
+    <div class="ui-element top-right toggle-lang-btn">
+      <span class="lang-en lang-active">EN</span> /
+      <span class="lang-vi lang-inactive">VI</span>
+    </div>
+    <div class="ui-element bottom-left" id="text-bottom-left">
+      NGUYEN HOANG HAI DANG © 2026.
+    </div>
+    <div class="ui-element bottom-center" id="about-me-trigger">ABOUT ME</div>
+    <div class="ui-element bottom-right" id="text-bottom-right">
+      <a href="https://www.facebook.com/HakaiBeerusDev" target="_blank"
+        >NO LOVE BIG PROBLEM - LOVE YOURSELF</a
+      >
+    </div>
+
+    <div class="hero-container" id="hero-section">
+      <div class="cta-box">
+        <div class="main-title" id="text-main-title">
+          YOU ARE SO BOOSTED / TRASH PLAYER
+        </div>
+        <button class="explore-button" id="explore-btn">+ EXPLORE</button>
+      </div>
+    </div>
+
+    <div class="menu-container" id="menu-section">
+      <nav class="menu-navigation">
+        <ul>
+          <li style="transition-delay: 0.1s">
+            <a href="#" class="menu-link" id="menu-1">PROJECTS</a>
+          </li>
+          <li style="transition-delay: 0.2s">
+            <a href="#" class="menu-link" id="menu-2">GALLERY</a>
+          </li>
+          <li style="transition-delay: 0.3s">
+            <a href="#" class="menu-link" id="menu-3">EXPERIENCE</a>
+          </li>
+          <li style="transition-delay: 0.4s">
+            <a href="#" class="menu-link" id="menu-4">SHOP</a>
+          </li>
+        </ul>
+        <div class="menu-lang toggle-lang-btn">
+          <span class="lang-en lang-active">EN</span> /
+          <span class="lang-vi lang-inactive">VI</span>
+        </div>
+      </nav>
+      <div class="close-box">
+        <button class="close-button" id="close-btn">× CLOSE</button>
+      </div>
+    </div>
+
+    <div class="about-modal" id="aboutModal">
+      <div class="about-content">
+        <button class="close-about" id="closeAbout">×</button>
+        <h2>FROM HAI DANG</h2>
+        <p>
+          <strong>MCD BLOWSURMIND</strong> là một phiên bản duy nhất và đặc biệt
+          nhất của
+          <strong
+            ><a href="https://www.instagram.com/mcdblowsumind/" target="_blank"
+              >NHHD</a
+            ></strong
+          >, tên thật là Nguyễn Hoàng Hải Đăng.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // --- 1. XỬ LÝ NGÔN NGỮ ---
+      let currentLang = "en";
+
+      const dictionary = {
+        en: {
+          topLeft: "+ INTERACTIVE PORTFOLIO",
+          bottomLeft: "NGUYEN HOANG HAI DANG © 2026.",
+          aboutTrigger: "ABOUT ME",
+          // Đã gắn link Facebook chuẩn cho tiếng Anh
+          bottomRight:
+            '<a href="https://www.facebook.com/HakaiBeerusDev" target="_blank">NO LOVE BIG PROBLEM - LOVE YOURSELF</a>',
+          mainTitle: "YOU ARE SO BOOSTED / TRASH PLAYER",
+          exploreBtn: "+ EXPLORE",
+          menu1: "PROJECTS",
+          menu2: "GALLERY",
+          menu3: "EXPERIENCE",
+          menu4: "SHOP",
+          closeBtn: "× CLOSE",
+        },
+        vi: {
+          topLeft: "+ HỒ SƠ TƯƠNG TÁC",
+          bottomLeft: "BẢN QUYỀN THUỘC VỀ HẢI ĐĂNG © 2026.",
+          aboutTrigger: "VỀ TÔI",
+          // Đã gắn link Facebook chuẩn cho tiếng Việt
+          bottomRight:
+            '<a href="https://www.facebook.com/HakaiBeerusDev" target="_blank">KHÔNG TÌNH YÊU LÀ VẤN ĐỀ LỚN - HÃY YÊU BẢN THÂN</a>',
+          mainTitle: "BẠN LÀ THỂ LOẠI BÚ WIN, RÁC VCL",
+          exploreBtn: "+ KHÁM PHÁ",
+          menu1: "DỰ ÁN",
+          menu2: "THƯ VIỆN",
+          menu3: "KINH NGHIỆM",
+          menu4: "CỬA HÀNG",
+          closeBtn: "× ĐÓNG",
+        },
+      };
+
+      document.querySelectorAll(".toggle-lang-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          currentLang = currentLang === "en" ? "vi" : "en";
+          const lang = dictionary[currentLang];
+
+          // Dùng innerText cho chữ thường
+          document.getElementById("text-top-left").innerText = lang.topLeft;
+          document.getElementById("text-bottom-left").innerText =
+            lang.bottomLeft;
+          document.getElementById("about-me-trigger").innerText =
+            lang.aboutTrigger;
+
+          // Dùng innerHTML cho bottomRight để in ra thẻ <a href...>
+          document.getElementById("text-bottom-right").innerHTML =
+            lang.bottomRight;
+
+          document.getElementById("text-main-title").innerText = lang.mainTitle;
+          document.getElementById("explore-btn").innerText = lang.exploreBtn;
+          document.getElementById("menu-1").innerText = lang.menu1;
+          document.getElementById("menu-2").innerText = lang.menu2;
+          document.getElementById("menu-3").innerText = lang.menu3;
+          document.getElementById("menu-4").innerText = lang.menu4;
+          document.getElementById("close-btn").innerText = lang.closeBtn;
+
+          document
+            .querySelectorAll(".lang-en")
+            .forEach(
+              (el) =>
+                (el.className =
+                  currentLang === "en"
+                    ? "lang-en lang-active"
+                    : "lang-en lang-inactive"),
+            );
+          document
+            .querySelectorAll(".lang-vi")
+            .forEach(
+              (el) =>
+                (el.className =
+                  currentLang === "vi"
+                    ? "lang-vi lang-active"
+                    : "lang-vi lang-inactive"),
+            );
+        });
+      });
+
+      // --- 2. XỬ LÝ MENU BẬT/TẮT ---
+      const body = document.body;
+      document
+        .getElementById("explore-btn")
+        .addEventListener("click", () => body.classList.add("menu-active"));
+      document
+        .getElementById("close-btn")
+        .addEventListener("click", () => body.classList.remove("menu-active"));
+
+      // --- 3. XỬ LÝ POP-UP ABOUT ME ---
+      const aboutBtn = document.getElementById("about-me-trigger");
+      const aboutModal = document.getElementById("aboutModal");
+      const closeAbout = document.getElementById("closeAbout");
+
+      aboutBtn.addEventListener("click", () => {
+        aboutModal.classList.add("active");
+      });
+
+      closeAbout.addEventListener("click", () => {
+        aboutModal.classList.remove("active");
+      });
+
+      aboutModal.addEventListener("click", (e) => {
+        if (e.target === aboutModal) {
+          aboutModal.classList.remove("active");
+        }
+      });
+    </script>
+  </body>
+</html>
