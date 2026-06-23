@@ -21,7 +21,7 @@
 ---
 
 ### ✦ ABOUT ME
-**MCD BLOWSURMIND** là một phiên bản duy nhất và đặc biệt nhất của **[NHHD](https://www.instagram.com/mcdblowsurmind/)**, tên thật là Nguyễn Hoàng Hải Đăng.
+**MCD BLOWSURMIND** là một phiên bản duy nhất và đặc biệt nhất của **[NHHD](https://www.instagram.com/mcdblowsumind/)**, tên thật là Nguyễn Hoàng Hải Đăng.
 
 ### ✦ CONNECT WITH ME
 <div align="center">
