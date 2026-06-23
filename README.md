@@ -4,7 +4,7 @@
 
   <br><br>
 
-  <h1>N G U Y E N  H O A N G  H A I  D A N G</h1>
+  <h1>N G U Y E N - H O A N G - H A I - D A N G</h1>
   
   <p>
     <i>" NO LOVE BIG PROBLEM - LOVE YOURSELF "</i>
