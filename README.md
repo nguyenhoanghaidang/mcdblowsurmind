@@ -9,7 +9,7 @@
     <i>" NO LOVE BIG PROBLEM - LOVE YOURSELF "</i>
   </p>
 
-  <a href="LINK_TRANG_WEB_CỦA_BẠN">
+  <a href="(https://nguyenhoanghaidang.github.io/mcdblowsurmind/)">
     <img src="https://img.shields.io/badge/EXPLORE_MY_PORTFOLIO-050505?style=for-the-badge&logo=vercel&logoColor=white&border=red">
   </a>
 
