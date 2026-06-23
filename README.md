@@ -2,7 +2,6 @@
 
   <img src="https://i.pinimg.com/originals/a0/0a/63/a00a6316277254d3db2a0c41b80db2bd.gif" width="100%" alt="Dark Aesthetic Banner">
 
-  <br><br>
 
   <h1>N G U Y E N - H O A N G - H A I - D A N G</h1>
   
